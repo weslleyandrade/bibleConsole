@@ -1,22 +1,28 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/weslleyandrade/bibleConsole/provider"
+	"os"
 )
 
 func main() {
 	prov := &provider.Biblebox{}
+	scanner := bufio.NewScanner(os.Stdin)
 	for {
-		var book string
-		var chapter string
-		var verse string
+
 		fmt.Print("Livro: ")
-		fmt.Scanln(&book)
+		scanner.Scan()
+		book := scanner.Text()
+
 		fmt.Printf("%s > Capitulo: ", book)
-		fmt.Scanln(&chapter)
+		scanner.Scan()
+		chapter := scanner.Text()
+
 		fmt.Printf("%s > %s > Versiculo: ", book, chapter)
-		fmt.Scanln(&verse)
+		scanner.Scan()
+		verse := scanner.Text()
 
 		if verse == "" {
 			fmt.Printf("%s > %s : \n", book, chapter)

@@ -3,6 +3,7 @@ package provider
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -19,27 +20,42 @@ const (
 type Biblebox struct {
 }
 
-func (b Biblebox) getDate(book string, chapter string) []interface{} {
-	url := fmt.Sprintf("%v/%v/%v.json", URL, getBook(book), chapter)
+func (b Biblebox) getDate(book string, chapter string) ([]interface{}, error) {
+	var verses []interface{}
+	nBook, err := getBook(book)
+	if err != nil {
+		return verses, err
+	}
+
+	url := fmt.Sprintf("%v/%v/%v.json", URL, nBook, chapter)
 
 	res, _ := http.Get(url)
 
-	var date interface{}
+	if res.StatusCode != 200 {
+		return verses, errors.New("Capitulo nao encontrado!")
+	}
 
 	body, _ := ioutil.ReadAll(res.Body)
 
+	var date interface{}
 	json.Unmarshal(body, &date)
 
 	m := date.(map[string]interface{})
+	verses = m["verses"].([]interface{})
 
-	return m["verses"].([]interface{})
+	return verses, nil
 }
 
 // Obtem o capitulo para o livro solicitado
 // a partir da api do biblebox ex.: https://biblebox-data.turbobytes.net/nvi/1/1.json
 func (b Biblebox) GetChapter(book string, chapter string) string {
 	var out bytes.Buffer
-	list := b.getDate(book, chapter)
+
+	list, err := b.getDate(book, chapter)
+
+	if err != nil {
+		return err.Error()
+	}
 
 	for _, v := range list {
 		verseNumber := fmt.Sprintf("%v", v.(map[string]interface{})["number"])
@@ -52,13 +68,26 @@ func (b Biblebox) GetChapter(book string, chapter string) string {
 
 // Obtem o versiculo para o livro e capitulo solicitado
 func (b Biblebox) GetVerses(book string, chapter string, verse string) string {
-	list := b.getDate(book, chapter)
+
+	list, err := b.getDate(book, chapter)
+	if err != nil {
+		return err.Error()
+	}
 	verseNumber, _ := strconv.Atoi(verse)
-	v := list[verseNumber-1].(map[string]interface{})
-	return v["rawText"].(string)
+	verseIndex := verseNumber - 1
+	if len(list) < verseIndex {
+		return "Versiculo nao encontrado!"
+	}
+
+	v := list[verseIndex]
+
+	return v.(map[string]interface{})["rawText"].(string)
 }
 
-func getBook(book string) float64 {
+func getBook(book string) (string, error) {
+	var nBook float64
+	var err error
+
 	res, _ := http.Get("https://biblebox-data.turbobytes.net/books_index.json")
 
 	body, _ := ioutil.ReadAll(res.Body)
@@ -68,5 +97,15 @@ func getBook(book string) float64 {
 	json.Unmarshal(body, &date)
 
 	font := date.(map[string]interface{})
-	return font[strings.ToLower(book)].(float64)
+
+	auxBook := font[strings.ToLower(book)]
+
+	if auxBook == nil {
+		err = errors.New("Livro nao encontrado!")
+	} else {
+		nBook = auxBook.(float64)
+	}
+
+	return fmt.Sprint(nBook), err
+
 }
