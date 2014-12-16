@@ -1,2 +1,2 @@
-bibleConsole [![wercker status](https://app.wercker.com/status/9b8bacfc036334dd3004d106e2ebb40e/s "wercker status")](https://app.wercker.com/project/bykey/9b8bacfc036334dd3004d106e2ebb40e)
+bibleConsole [![wercker status](https://app.wercker.com/status/9b8bacfc036334dd3004d106e2ebb40e/s "wercker status")](https://app.wercker.com/project/bykey/9b8bacfc036334dd3004d106e2ebb40e) [![Gobuild Download](http://gobuild.io/badge/github.com/weslleyandrade/bibleConsole/downloads.svg)](http://gobuild.io/github.com/weslleyandrade/bibleConsole) [![GoWalker](http://img.shields.io/badge/doc-gowalker-blue.svg?style=flat)](https://gowalker.org/github.com/weslleyandrade/bibleConsole)
 ============
