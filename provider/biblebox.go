@@ -73,15 +73,24 @@ func (b Biblebox) GetVerses(book string, chapter string, verse string) string {
 	if err != nil {
 		return err.Error()
 	}
-	verseNumber, _ := strconv.Atoi(verse)
-	verseIndex := verseNumber - 1
-	if len(list) < verseIndex {
-		return "Versiculo nao encontrado!"
+	verses := strings.Split(verse, "-")
+	minorVerse, _ := strconv.Atoi(verses[0])
+	majorVerse, _ := strconv.Atoi(verses[1])
+
+	verseIndex := majorVerse - 1
+	if len(list) < verseIndex || minorVerse > majorVerse {
+		return "Versiculo nao encontrado, ou formato inconsistente"
 	}
 
-	v := list[verseIndex]
+	var out bytes.Buffer
 
-	return v.(map[string]interface{})["rawText"].(string)
+	for i := minorVerse; i <= majorVerse; i++ {
+		v := list[i-1]
+		verseNumber := fmt.Sprintf("%v", v.(map[string]interface{})["number"])
+		out.WriteString("\n" + verseNumber + " " + v.(map[string]interface{})["rawText"].(string))
+	}
+
+	return out.String()
 }
 
 func getBook(book string) (string, error) {
