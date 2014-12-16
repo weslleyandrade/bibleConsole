@@ -4,26 +4,21 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/weslleyandrade/bibleConsole/provider"
+	"flag"
 	"os"
 )
 
 func main() {
 	prov := &provider.Biblebox{}
 
-	lenArgs := len(os.Args)
+	terminal := flag.Bool("t",false,"Modo terminal interativo")
+	book := flag.String("l","","Livro")
+	chapter := flag.String("c","","Capitulo")
+	verse := flag.String("v","","Versiculo")
+	flag.Parse()
 
-	if lenArgs > 2 {
-		book := os.Args[1]
-		chapter := os.Args[2]
-		if lenArgs > 3 {
-			verse := os.Args[3]
-			fmt.Println(prov.GetVerses(book, chapter, verse))
 
-		} else {
-			fmt.Println(prov.GetChapter(book, chapter))
-		}
-
-	} else {
+	if *terminal {
 		scanner := bufio.NewScanner(os.Stdin)
 		for {
 
@@ -42,10 +37,16 @@ func main() {
 			if verse == "" {
 				fmt.Printf("%s > %s : \n", book, chapter)
 				fmt.Println(prov.GetChapter(book, chapter))
-			} else {
-				fmt.Printf("%s > %s > %s : \n", book, chapter, verse)
-				fmt.Println(prov.GetVerses(book, chapter, verse))
+				} else {
+					fmt.Printf("%s > %s > %s : \n", book, chapter, verse)
+					fmt.Println(prov.GetVerses(book, chapter, verse))
+				}
 			}
+	} else {
+		if *verse == ""{
+			fmt.Println(prov.GetChapter(*book, *chapter))
+		}else{
+			fmt.Println(prov.GetVerses(*book, *chapter, *verse))
 		}
 	}
 }
