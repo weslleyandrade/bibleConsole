@@ -73,9 +73,17 @@ func (b Biblebox) GetVerses(book string, chapter string, verse string) string {
 	if err != nil {
 		return err.Error()
 	}
-	verses := strings.Split(verse, "-")
-	minorVerse, _ := strconv.Atoi(verses[0])
-	majorVerse, _ := strconv.Atoi(verses[1])
+
+	var minorVerse, majorVerse int
+
+	if strings.Contains(verse, "-") {
+		verses := strings.Split(verse, "-")
+		minorVerse, _ = strconv.Atoi(verses[0])
+		majorVerse, _ = strconv.Atoi(verses[1])
+	} else {
+		minorVerse, _ = strconv.Atoi(verse)
+		majorVerse = minorVerse
+	}
 
 	verseIndex := majorVerse - 1
 	if len(list) < verseIndex || minorVerse > majorVerse {
