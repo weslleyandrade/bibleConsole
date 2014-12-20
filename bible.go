@@ -64,9 +64,16 @@ func interactive(prov *provider.Biblebox) {
 func queryParse(query string) (*string, *string, *string) {
 	var book, chapter, verse *string
 	b := strings.Split(query, " ")
-	cv := strings.Split(b[1], ":")
 	book = &b[0]
-	chapter = &cv[0]
-	verse = &cv[1]
+
+	if strings.Contains(b[1], ":") {
+		cv := strings.Split(b[1], ":")
+		chapter = &cv[0]
+		verse = &cv[1]
+	} else {
+		chapter = &b[1]
+		verse = new(string)
+	}
+
 	return book, chapter, verse
 }
