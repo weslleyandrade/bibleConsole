@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/weslleyandrade/bibleConsole/provider"
+	"provider"
 	"flag"
 	"os"
 )
