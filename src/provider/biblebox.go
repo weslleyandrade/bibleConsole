@@ -2,13 +2,15 @@ package provider
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strconv"
-	"crypto/tls"
+	"strings"
 )
 
 const (
@@ -18,16 +20,16 @@ const (
 
 func init() {
 	cfg := &tls.Config{
-	  MaxVersion:               tls.VersionTLS11,
-	  PreferServerCipherSuites: true,
+		MaxVersion:               tls.VersionTLS11,
+		PreferServerCipherSuites: true,
 	}
 
 	http.DefaultClient.Transport = &http.Transport{
-	  TLSClientConfig: cfg,
+		TLSClientConfig: cfg,
 	}
 }
 
-// biblebox version 2 provider 
+// biblebox version 2 provider
 type Biblebox struct {
 }
 
@@ -121,13 +123,26 @@ func getBook(book string) (string, error) {
 	body, _ := ioutil.ReadAll(res.Body)
 
 	var date interface{}
+	var auxBook interface{}
 
 	json.Unmarshal(body, &date)
 
 	font := date.([]interface{})
 
-	nBook2, _ := strconv.Atoi(book)
-	auxBook := font[nBook2-1].(map[string]interface{})["number"]
+	nBook2, errAtoi := strconv.Atoi(book)
+	if errAtoi == nil {
+		auxBook = font[nBook2-1].(map[string]interface{})["number"]
+	} else {
+		for _, v := range font {
+			bookName := v.(map[string]interface{})["name"]
+
+			if strings.ToLower(bookName.(string)) == strings.ToLower(book) {
+				auxBook = v.(map[string]interface{})["number"]
+			}
+		}
+	}
+
+	fmt.Println(reflect.TypeOf(auxBook))
 
 	if auxBook == nil {
 		err = errors.New("Livro nao encontrado!")

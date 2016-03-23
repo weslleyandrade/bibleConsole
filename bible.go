@@ -2,22 +2,16 @@ package main
 
 import (
 	"bufio"
-<<<<<<< HEAD
-	"fmt"
-	"provider"
-=======
->>>>>>> refs/remotes/origin/master
 	"flag"
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/weslleyandrade/bibleConsole/provider"
+	"github.com/weslleyandrade/bibleConsole/src/provider"
 )
 
 func main() {
 	prov := &provider.Biblebox{}
-
 	terminal := flag.Bool("t", false, "Modo terminal interativo")
 	book := flag.String("l", "", "Livro ex. genesis")
 	chapter := flag.String("c", "", "Capitulo ex. 1")
