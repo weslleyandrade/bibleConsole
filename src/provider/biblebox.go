@@ -8,15 +8,26 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"strings"
+	"crypto/tls"
 )
 
 const (
-	URL       = "https://biblebox-data.turbobytes.net/nvi"
-	URL_BOOKS = "https://biblebox-data.turbobytes.net/books_index.json"
+	URL       = "https://www.bibliaonline.com.br/_data/v2/bibles/nvi"
+	URL_BOOKS = "https://www.bibliaonline.com.br/_data/v2/books/pt.json"
 )
 
-// Provider para consumo da API do http://biblebox.com/
+func init() {
+	cfg := &tls.Config{
+	  MaxVersion:               tls.VersionTLS11,
+	  PreferServerCipherSuites: true,
+	}
+
+	http.DefaultClient.Transport = &http.Transport{
+	  TLSClientConfig: cfg,
+	}
+}
+
+// biblebox version 2 provider 
 type Biblebox struct {
 }
 
@@ -105,7 +116,7 @@ func getBook(book string) (string, error) {
 	var nBook float64
 	var err error
 
-	res, _ := http.Get("https://biblebox-data.turbobytes.net/books_index.json")
+	res, _ := http.Get(URL_BOOKS)
 
 	body, _ := ioutil.ReadAll(res.Body)
 
@@ -113,9 +124,10 @@ func getBook(book string) (string, error) {
 
 	json.Unmarshal(body, &date)
 
-	font := date.(map[string]interface{})
+	font := date.([]interface{})
 
-	auxBook := font[strings.ToLower(book)]
+	nBook2, _ := strconv.Atoi(book)
+	auxBook := font[nBook2-1].(map[string]interface{})["number"]
 
 	if auxBook == nil {
 		err = errors.New("Livro nao encontrado!")

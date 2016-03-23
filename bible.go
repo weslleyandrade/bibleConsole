@@ -2,6 +2,11 @@ package main
 
 import (
 	"bufio"
+<<<<<<< HEAD
+	"fmt"
+	"provider"
+=======
+>>>>>>> refs/remotes/origin/master
 	"flag"
 	"fmt"
 	"os"
